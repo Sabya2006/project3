@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Employees - Enterprise Final</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', system-ui, sans-serif; transition: background 0.3s, color 0.3s; }
+        
+        /* Glassmorphism & Animations */
+        .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); }
+        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .slide-out { animation: slideOut 0.5s ease-in forwards; }
+        @keyframes slideOut { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-100%); opacity: 0; visibility: hidden; display: none; } }
+
+        /* 3D Text Effect */
+        .text-3d {
+            text-shadow: 2px 2px 0px rgba(79, 70, 229, 0.2), 
+                         4px 4px 0px rgba(79, 70, 229, 0.1),
+                         6px 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Utilities */
+        .hidden { display: none !important; }
+        
+        /* Sidebar Custom Styles based on Image */
+        .sidebar-bg { background-color: #0A0F1C; }
+        .nav-item { color: #94a3b8; transition: all 0.2s ease; }
+        .nav-item:hover { background-color: #1A2235; color: white; }
+        .active-nav { background-color: #1A2235 !important; color: white !important; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+        .dark ::-webkit-scrollbar-thumb { background-color: #334155; }
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { colors: { indigo: { 950: '#1e1b4b' } } } }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-900 h-screen overflow-hidden dark:bg-slate-950 dark:text-slate-100 selection:bg-indigo-500 selection:text-white">
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed top-5 right-5 z-[80] bg-emerald-600 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform translate-x-[200%] opacity-0 transition-all">
+        <i data-lucide="check-circle" class="w-5 h-5"></i>
+        <span id="toastMsg" class="font-bold text-sm">Action Successful</span>
+    </div>
+
+    <!-- ================= 0. LANDING SCREEN (HOME) ================= -->
+    <div id="landingScreen" class="fixed inset-0 z-[60] bg-slate-50 overflow-y-auto font-sans transition-all duration-500 fade-in">
+        
+        <!-- Navbar -->
+        <header class="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 z-50 transition-all shadow-sm">
+            <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg shadow-md bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <i data-lucide="briefcase" class="text-white w-6 h-6"></i>
+                    </div>
+                    <span class="font-bold text-xl text-indigo-950 tracking-tight">My Employees</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="goToLogin()" class="text-indigo-900 font-bold px-4 py-2.5 rounded-xl hover:bg-indigo-50 transition">Login</button>
+                    <button onclick="goToRegister()" class="bg-indigo-600 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-indigo-700 shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">Registration</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="pt-40 pb-20 px-6 min-h-[80vh] flex flex-col items-center justify-center text-center bg-gradient-to-b from-indigo-50 to-slate-50 relative overflow-hidden">
+            <!-- Decorative background elements -->
+            <div class="absolute top-20 left-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+            <div class="absolute top-40 right-10 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style="animation-delay: 2s;"></div>
+            <div class="absolute -bottom-10 right-1/3 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style="animation-delay: 4s;"></div>
+            
+            <h1 class="text-5xl md:text-7xl font-extrabold text-indigo-950 mb-6 tracking-tight text-3d leading-tight z-10 max-w-4xl mx-auto">
+                Welcome to <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">My Employees Web</span>
+            </h1>
+            <p class="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto z-10 leading-relaxed font-medium">
+                The all-in-one professional enterprise portal. Streamline your HR operations, empower your managers, and seamlessly connect your entire workforce.
+            </p>
+            <div class="flex gap-4 z-10">
+                <button onclick="goToRegister()" class="bg-indigo-600 text-white font-bold px-8 py-4 rounded-full text-lg hover:bg-indigo-700 shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1 flex items-center gap-2">
+                    Get Started <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+                <a href="#features" class="bg-white text-indigo-900 font-bold px-8 py-4 rounded-full text-lg border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all flex items-center gap-2 shadow-sm">
+                    Explore Features
+                </a>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-24 px-6 bg-white z-10 relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold text-indigo-950 mb-4">Everything You Need to Manage Your Team</h2>
+                    <p class="text-slate-600 max-w-2xl mx-auto text-lg">Scroll through our comprehensive suite of tools built specifically for modern enterprises and their employees.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Feature 1 -->
+                    <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-xl hover:border-indigo-200 transition-all duration-300 transform hover:-translate-y-1 group">
+                        <div class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"><i data-lucide="users" class="w-7 h-7"></i></div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">Employee Directory</h3>
+                        <p class="text-slate-600">Centralized database for all staff members. Instantly access roles, departments, and secure payroll details.</p>
+                    </div>
+                    <!-- Feature 2 -->
+                    <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform hover:-translate-y-1 group">
+                        <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"><i data-lucide="calendar-check" class="w-7 h-7"></i></div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">Attendance & Leaves</h3>
+                        <p class="text-slate-600">Track daily attendance effortlessly and manage sick or casual leave requests with a one-click approval system.</p>
+                    </div>
+                    <!-- Feature 3 -->
+                    <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-xl hover:border-blue-200 transition-all duration-300 transform hover:-translate-y-1 group">
+                        <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"><i data-lucide="star" class="w-7 h-7"></i></div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">Performance Reviews</h3>
+                        <p class="text-slate-600">Conduct regular performance evaluations. Store ratings and feedback histories securely in the cloud.</p>
+                    </div>
+                    <!-- Feature 4 -->
+                    <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-xl hover:border-emerald-200 transition-all duration-300 transform hover:-translate-y-1 group">
+                        <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"><i data-lucide="building-2" class="w-7 h-7"></i></div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">Department Management</h3>
+                        <p class="text-slate-600">Organize your company structure. Monitor departmental budgets and manage distinct organizational units.</p>
+                    </div>
+                    <!-- Feature 5 -->
+                    <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-xl hover:border-rose-200 transition-all duration-300 transform hover:-translate-y-1 group">
+                        <div class="w-14 h-14 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"><i data-lucide="megaphone" class="w-7 h-7"></i></div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">Company Announcements</h3>
+                        <p class="text-slate-600">Broadcast important news, updates, and events to the entire organization via a centralized feed.</p>
+                    </div>
+                    <!-- Feature 6 -->
+                    <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-xl hover:border-amber-200 transition-all duration-300 transform hover:-translate-y-1 group">
+                        <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"><i data-lucide="video" class="w-7 h-7"></i></div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">Virtual Meetings & Chat</h3>
+                        <p class="text-slate-600">Built-in HR chat support and video meeting rooms to keep your remote or hybrid teams deeply connected.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-indigo-950 text-indigo-200 py-12 text-center">
+            <div class="flex items-center justify-center gap-3 mb-6">
+                <div class="w-8 h-8 rounded border border-indigo-700 bg-indigo-900 flex items-center justify-center">
+                    <i data-lucide="briefcase" class="text-indigo-400 w-4 h-4"></i>
+                </div>
+                <span class="font-bold text-lg text-white tracking-tight">My Employees Web</span>
+            </div>
+            <p class="mb-6 opacity-60 text-sm max-w-md mx-auto">Empowering businesses, HR managers, and employees to do their best work together seamlessly.</p>
+            <p class="text-xs opacity-50">&copy; 2026 My Employees Enterprise. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- ================= 1. LOGIN SCREEN ================= -->
+    <div id="loginScreen" class="fixed inset-0 z-[70] flex items-center justify-center bg-cover bg-center hidden" style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');">
+        <div class="absolute inset-0 bg-indigo-950/90 backdrop-blur-md"></div>
+        
+        <!-- Back to Home Button -->
+        <button type="button" onclick="goToHome()" class="absolute top-6 left-6 text-white/70 hover:text-white flex items-center gap-2 text-sm font-bold transition-colors z-10 bg-white/10 px-4 py-2 rounded-full backdrop-blur-md">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Home
+        </button>
+
+        <div class="relative bg-white/10 p-8 rounded-3xl shadow-2xl border border-white/20 w-full max-w-md backdrop-blur-xl fade-in flex flex-col">
+            <div class="text-center mb-6">
+                <!-- PROFESSIONAL LOGO -->
+                <div class="mx-auto w-24 h-24 mb-4 rounded-2xl flex items-center justify-center shadow-lg border border-white/20 overflow-hidden group hover:scale-105 transition-transform duration-500 bg-gradient-to-br from-indigo-500 to-purple-600">
+                     <i data-lucide="briefcase" class="w-12 h-12 text-white"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-1 tracking-tight">My Employees</h1>
+                <p class="text-indigo-200 text-sm font-medium">Enterprise Portal Access</p>
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-indigo-100 text-xs font-bold uppercase mb-1 ml-1 tracking-wider">Gmail ID</label>
+                    <div class="relative">
+                        <i data-lucide="mail" class="absolute left-3 top-3 text-indigo-300 w-5 h-5"></i>
+                        <input type="email" id="loginEmail" class="w-full bg-white/10 border border-indigo-400/30 text-white rounded-xl py-2.5 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder-indigo-300/50 font-medium transition-all" placeholder="Enter your email" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-indigo-100 text-xs font-bold uppercase mb-1 ml-1 tracking-wider">Employee ID</label>
+                    <div class="relative">
+                        <i data-lucide="badge-check" class="absolute left-3 top-3 text-indigo-300 w-5 h-5"></i>
+                        <input type="text" id="loginId" class="w-full bg-white/10 border border-indigo-400/30 text-white rounded-xl py-2.5 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder-indigo-300/50 font-mono tracking-wide transition-all" placeholder="e.g. EM0001 or Boss0000" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-indigo-100 text-xs font-bold uppercase mb-1 ml-1 tracking-wider">Password</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="absolute left-3 top-3 text-indigo-300 w-5 h-5"></i>
+                        <input type="password" id="loginPassword" class="w-full bg-white/10 border border-indigo-400/30 text-white rounded-xl py-2.5 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder-indigo-300/50 transition-all" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-white text-indigo-900 font-bold py-3.5 rounded-xl hover:bg-indigo-50 hover:scale-[1.02] active:scale-95 transition-all shadow-lg flex items-center justify-center group mt-2">
+                    <span id="btnText">Login to Workspace</span>
+                    <i data-lucide="arrow-right" class="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </form>
+            
+            <div class="mt-4 text-center">
+                <p class="text-indigo-200 text-xs">New user? <button type="button" onclick="goToRegister()" class="text-white font-bold hover:underline underline-offset-4 decoration-indigo-400">Register Here</button></p>
+            </div>
+            
+            <div class="mt-4 text-center">
+                <button onclick="resetData()" class="text-[10px] text-red-300 hover:text-red-100 underline">Reset All Data (Factory Reset)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 2. REGISTRATION SCREEN ================= -->
+    <div id="registerScreen" class="hidden fixed inset-0 z-[70] flex items-center justify-center bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1486406140926-c627a92ad1ab?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');">
+        <div class="absolute inset-0 bg-purple-950/90 backdrop-blur-md"></div>
+
+        <!-- Back to Home Button -->
+        <button type="button" onclick="goToHome()" class="absolute top-6 left-6 text-white/70 hover:text-white flex items-center gap-2 text-sm font-bold transition-colors z-10 bg-white/10 px-4 py-2 rounded-full backdrop-blur-md">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Home
+        </button>
+
+        <div class="relative bg-white/10 p-8 rounded-3xl shadow-2xl border border-white/20 w-full max-w-md backdrop-blur-xl fade-in">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-white mb-1">Create Account</h2>
+                <p class="text-purple-200 text-sm">Join the enterprise workspace</p>
+                <div class="mt-3 bg-purple-900/50 border border-purple-500/30 rounded p-3 text-xs text-purple-100 text-left">
+                    <strong class="text-white block mb-1">ID Assignment:</strong>
+                    • Your unique Employee ID will be <strong>auto-generated</strong> upon successful registration.<br>
+                    • Please select your correct organizational role below.
+                </div>
+            </div>
+            <form onsubmit="handleRegister(event)" id="regForm" class="space-y-4">
+                <div><label class="block text-purple-100 text-xs font-bold uppercase mb-1 ml-1">Full Name</label><input type="text" id="regName" class="w-full bg-white/10 border border-purple-400/30 text-white rounded-xl py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder-purple-300/50" placeholder="John Doe" required></div>
+                <div><label class="block text-purple-100 text-xs font-bold uppercase mb-1 ml-1">Gmail ID</label><input type="email" id="regEmail" class="w-full bg-white/10 border border-purple-400/30 text-white rounded-xl py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder-purple-300/50" placeholder="name@gmail.com" required></div>
+                <div>
+                    <label class="block text-purple-100 text-xs font-bold uppercase mb-1 ml-1">Account Role</label>
+                    <select id="regRole" class="w-full bg-white/10 border border-purple-400/30 text-white rounded-xl py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-purple-400 appearance-none">
+                        <option value="Employee" class="text-slate-900">Standard Employee</option>
+                        <option value="HR" class="text-slate-900">HR Manager</option>
+                        <option value="Admin" class="text-slate-900">Admin</option>
+                    </select>
+                </div>
+                <div><label class="block text-purple-100 text-xs font-bold uppercase mb-1 ml-1">Password</label><input type="password" id="regPassword" class="w-full bg-white/10 border border-purple-400/30 text-white rounded-xl py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder-purple-300/50" placeholder="••••••••" required></div>
+                <button type="submit" class="w-full bg-purple-500 text-white font-bold py-3 rounded-xl hover:bg-purple-600 hover:scale-[1.02] active:scale-95 transition-all shadow-lg flex items-center justify-center mt-2"><span>Register Account</span></button>
+            </form>
+            <div class="mt-6 text-center"><p class="text-purple-200 text-xs">Already registered? <button type="button" onclick="goToLogin()" class="text-white font-bold hover:underline underline-offset-4 decoration-purple-400">Login Here</button></p></div>
+        </div>
+    </div>
+
+    <!-- ================= 3. MAIN APP INTERFACE ================= -->
+    <div id="appScreen" class="hidden flex h-screen w-full">
+        
+        <!-- SIDEBAR -->
+        <aside class="w-64 sidebar-bg flex flex-col shadow-2xl z-20 border-r border-slate-800/50">
+            <div class="p-6 border-b border-slate-800/50 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg shadow-lg border border-white/10 overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 flex justify-center items-center">
+                    <i data-lucide="briefcase" class="text-white w-6 h-6"></i>
+                </div>
+                <span class="font-bold text-lg text-white tracking-tight leading-tight">My<br>Employees</span>
+            </div>
+            
+            <nav class="flex-1 p-3 overflow-y-auto custom-scroll">
+                <div class="text-[10px] font-bold text-slate-500 uppercase px-3 mb-2 mt-2 tracking-widest">Overview</div>
+                <div onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active-nav flex items-center px-3 py-2.5 mb-1 rounded-xl cursor-pointer">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3"></i> <span class="text-sm font-medium">Dashboard</span>
+                </div>
+                <div onclick="switchTab('announcements')" id="nav-announcements" class="nav-item flex items-center px-3 py-2.5 mb-1 rounded-xl cursor-pointer">
+                    <i data-lucide="megaphone" class="w-5 h-5 mr-3"></i> <span class="text-sm font-medium">Announcements</span>
+                </div>
+                <div onclick="switchTab('employees')" id="nav-employees" class="nav-item flex items-center px-3 py-2.5 mb-1 rounded-xl cursor-pointer">
+                    <i data-lucide="users" class="w-5 h-5 mr-3"></i> <span class="text-sm font-medium">Employees</span>
+                </div>
+
+                <div class="text-[10px] font-bold text-slate-500 uppercase px-3 mb-2 mt-6 tracking-widest">Management</div>
+                <div onclick="switchTab('departments')" id="nav-departments" class="nav-item flex items-center px-3 py-2.5 mb-1 rounded-xl cursor-pointer">
+                    <i data-lucide="building-2" class="w-5 h-5 mr-3"></i> <span class="text-sm font-medium">Departments</span>
+                </div>
+                <div onclick="switchTab('attendance')" id="nav-attendance" class="nav-item flex items-center px-3 py-2.5 mb-1 rounded-xl cursor-pointer">
+                    <i data-lucide="calendar-check" class="w-5 h-5 mr-3"></i> <span class="text-sm font-medium">Attendance</span>
+                </div>
+                 <div onclick="switchTab('leaves')" id="nav-leaves" class="nav-item flex items-center px-3 py-2.5 mb-1 rounded-xl cursor-pointer">
+                    <i data-lucide="calendar-clock" class="w-5 h-5 mr-3"></i> <span class="text-sm font-medium">Leaves</span>
+                </div>
+                 <div onclick="switchTab('performance')" id="nav-performance" class="nav-item flex items-center px-3 py-2.5 mb-1 rounded-xl cursor-pointer">
+                    <i data-lucide="star" class="w-5 h-5 mr-3"></i> <span class="text-sm font-medium">Performance</span>
+                </div>
+
+                <div class="text-[10px] font-bold text-slate-500 uppercase px-3 mb-2 mt-6 tracking-widest">Connect</div>
+                 <div onclick="switchTab('documents')" id="nav-documents" class="nav-item flex items-center px-3 py-2.5 mb-1 rounded-xl cursor-pointer">
+                    <i data-lucide="folder-open" class="w-5 h-5 mr-3"></i> <span class="text-sm font-medium">Documents</span>
+                </div>
+                <div onclick="switchTab('meeting')" id="nav-meeting" class="nav-item flex items-center px-3 py-2.5 mb-1 rounded-xl cursor-pointer">
+                    <i data-lucide="video" class="w-5 h-5 mr-3"></i> <span class="text-sm font-medium">Meeting Room</span>
+                </div>
+                <div onclick="switchTab('chat')" id="nav-chat" class="nav-item flex items-center px-3 py-2.5 mb-1 rounded-xl cursor-pointer">
+                    <i data-lucide="message-square" class="w-5 h-5 mr-3"></i> <span class="text-sm font-medium">HR Chat</span>
+                </div>
+            </nav>
+
+            <div class="p-4 sidebar-bg border-t border-slate-800/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center font-mono text-xs font-bold border border-indigo-400 text-white" id="userAvatar">BO</div>
+                    <div class="overflow-hidden">
+                        <p class="text-sm font-bold text-white truncate" id="currentRoleLabel">Ultimate Boss</p>
+                        <p class="text-[10px] text-slate-400 font-mono" id="currentIdLabel">Boss0000</p>
+                    </div>
+                </div>
+                
+                <button onclick="handleLogout()" class="mt-4 w-full flex items-center justify-center text-xs text-red-400 hover:text-white hover:bg-red-500 py-2 bg-red-400/10 rounded-lg transition-colors font-bold shadow-sm">
+                    <i data-lucide="log-out" class="w-4 h-4 mr-2"></i> Sign Out
+                </button>
+
+                <!-- Role Simulator -->
+                <div id="roleSimulatorContainer" class="mt-4 pt-3 border-t border-slate-800 opacity-75 hover:opacity-100 transition hidden">
+                    <label class="text-[9px] uppercase font-bold text-indigo-400 mb-1 block">Dev Role View:</label>
+                    <select id="roleSelector" onchange="updateRole(true)" class="w-full bg-slate-950 border border-slate-700 rounded p-1 text-[10px] text-white outline-none cursor-pointer">
+                        <option value="Boss">Boss (Ultimate Head)</option>
+                        <option value="Admin">Admin (Full)</option>
+                        <option value="HR">HR Manager</option>
+                        <option value="Employee">Employee (View)</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 flex flex-col h-screen relative bg-slate-50 dark:bg-slate-950 transition-colors">
+            <!-- Navbar -->
+            <header class="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 z-10 sticky top-0">
+                <h1 class="text-lg font-bold text-slate-700 dark:text-slate-200 flex items-center" id="pageTitle">
+                    Dashboard Overview
+                </h1>
+                <div class="flex items-center gap-4">
+                    <div class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold flex items-center">
+                        <span class="w-2 h-2 rounded-full bg-green-600 mr-2 animate-pulse"></span> Online
+                    </div>
+                    <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
+                        <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
+                        <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Subscription Banner -->
+            <div id="trialBanner" class="hidden bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 text-sm flex justify-between items-center shadow-md z-10 relative">
+                <div class="flex items-center"><i data-lucide="sparkles" class="text-yellow-300 w-4 h-4 mr-2"></i><span class="font-bold">1-Month Free Trial: 30 days left</span></div>
+                <button onclick="openPaymentModal()" class="bg-white text-indigo-900 px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-indigo-50 shadow-sm hover:scale-105 transition-transform">Upgrade Now</button>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div id="contentArea" class="flex-1 overflow-y-auto p-8 relative">
+                
+                <!-- VIEW 1: DASHBOARD -->
+                <div id="view-dashboard" class="fade-in">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i data-lucide="users" class="w-12 h-12 text-indigo-500"></i></div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1" id="empCountLabel">Total Employees</p>
+                            <h3 class="text-3xl font-bold text-slate-800 dark:text-white" id="statTotal">0</h3>
+                        </div>
+                        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i data-lucide="check-circle" class="w-12 h-12 text-green-500"></i></div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Attendance</p>
+                            <h3 class="text-3xl font-bold text-slate-800 dark:text-white" id="statAttendance">95%</h3>
+                        </div>
+                         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i data-lucide="dollar-sign" class="w-12 h-12 text-blue-500"></i></div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1" id="payrollLabel">Payroll</p>
+                            <h3 class="text-3xl font-bold text-slate-800 dark:text-white" id="statPayroll">₹0</h3>
+                        </div>
+                        <!-- Admin Quick Action -->
+                        <div class="admin-only bg-gradient-to-br from-indigo-600 to-purple-700 p-6 rounded-2xl text-white shadow-lg relative overflow-hidden cursor-pointer hover:shadow-xl transition-all hover:scale-[1.02]" onclick="switchTab('employees'); openModal()">
+                            <h3 class="text-lg font-bold mb-1">Quick Action</h3>
+                            <div class="mt-2 w-full bg-white/20 text-xs py-2 rounded-lg flex items-center justify-center backdrop-blur-sm"><i data-lucide="plus" class="w-4 h-4 mr-2"></i> Hire Employee</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: ANNOUNCEMENTS -->
+                <div id="view-announcements" class="hidden fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Company Announcements</h2>
+                        <button onclick="openAnnouncementModal()" class="admin-only bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium shadow-lg flex items-center transition-all">
+                            <i data-lucide="plus" class="w-5 h-5 mr-2"></i> New Post
+                        </button>
+                    </div>
+                    <div id="announcementList" class="space-y-4"></div>
+                </div>
+
+                <!-- VIEW 2: EMPLOYEES -->
+                <div id="view-employees" class="hidden fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Staff Directory</h2>
+                        <button onclick="openModal()" class="admin-only bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium shadow-lg flex items-center transition-all"><i data-lucide="plus" class="w-5 h-5 mr-2"></i> Hire Employee</button>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+                                <tr>
+                                    <th class="p-4 text-xs font-bold text-slate-500 uppercase">ID</th>
+                                    <th class="p-4 text-xs font-bold text-slate-500 uppercase">Name & Email</th>
+                                    <th class="p-4 text-xs font-bold text-slate-500 uppercase">Role</th>
+                                    <th class="p-4 text-xs font-bold text-slate-500 uppercase">Dept</th>
+                                    <th class="admin-only p-4 text-xs font-bold text-slate-500 uppercase text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="empTable" class="divide-y divide-slate-100 dark:divide-slate-800">
+                                <!-- Rendered dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- VIEW 3: DEPARTMENTS -->
+                <div id="view-departments" class="hidden fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Departments</h2>
+                        <button onclick="openDeptModal()" class="admin-only bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-medium shadow-lg flex items-center transition-all">
+                            <i data-lucide="plus" class="w-5 h-5 mr-2"></i> Add Dept
+                        </button>
+                    </div>
+                    <div id="deptGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+                </div>
+                
+                <!-- VIEW 4: LEAVES -->
+                <div id="view-leaves" class="hidden fade-in">
+                     <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Leave Requests</h2>
+                        <button onclick="openLeaveModal()" class="bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-medium shadow-lg flex items-center"><i data-lucide="plus" class="w-5 h-5 mr-2"></i> Request Leave</button>
+                    </div>
+                    <div id="leaveList" class="space-y-4"></div>
+                </div>
+                
+                <!-- VIEW 5: ATTENDANCE -->
+                <div id="view-attendance" class="hidden fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Daily Attendance</h2>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+                                <tr>
+                                    <th class="p-4 text-xs font-bold text-slate-500 uppercase">Employee</th>
+                                    <th class="p-4 text-xs font-bold text-slate-500 uppercase text-right">Status (Today)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceTable" class="divide-y divide-slate-100 dark:divide-slate-800">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- VIEW 6: PERFORMANCE -->
+                <div id="view-performance" class="hidden fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Performance Reviews</h2>
+                        <button onclick="openPerformanceModal()" class="admin-only bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium shadow-lg flex items-center transition-all"><i data-lucide="plus" class="w-5 h-5 mr-2"></i> Add Review</button>
+                    </div>
+                    <div id="performanceGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                </div>
+
+                 <!-- VIEW 7: DOCUMENTS -->
+                <div id="view-documents" class="hidden fade-in">
+                    <div class="bg-white dark:bg-slate-900 p-12 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-center">
+                        <div class="mx-auto w-16 h-16 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mb-4"><i data-lucide="upload-cloud" class="w-8 h-8 text-indigo-500"></i></div>
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-2">Upload Files</h3>
+                        <p class="text-sm text-slate-500 mb-6">Drag and drop resumes, contracts, or IDs here.</p>
+                        <input type="file" id="fileInput" class="hidden" onchange="handleFileUpload(this)">
+                        <button onclick="document.getElementById('fileInput').click()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">Select File</button>
+                    </div>
+                    <div id="fileList" class="mt-8 space-y-2"></div>
+                </div>
+
+                 <!-- VIEW 8: CHAT -->
+                <div id="view-chat" class="hidden fade-in h-full flex flex-col">
+                    <div class="flex-1 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 overflow-y-auto mb-4 space-y-4" id="chatArea">
+                         <div class="flex gap-3">
+                            <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center"><i data-lucide="user" class="w-4 h-4 text-indigo-600"></i></div>
+                            <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg rounded-tl-none text-sm dark:text-slate-300">Hi, I have a question about my leave balance.</div>
+                        </div>
+                         <div class="flex gap-3 flex-row-reverse">
+                            <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center"><i data-lucide="shield" class="w-4 h-4 text-purple-600"></i></div>
+                            <div class="bg-purple-600 text-white p-3 rounded-lg rounded-tr-none text-sm">Hello! I am the HR Manager. You have 12 days remaining.</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <input id="chatInput" type="text" placeholder="Type message to HR..." class="flex-1 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                        <button onclick="sendChatMessage()" class="bg-indigo-600 text-white p-3 rounded-xl hover:bg-indigo-700"><i data-lucide="send" class="w-5 h-5"></i></button>
+                    </div>
+                </div>
+                
+                 <!-- VIEW 9: MEETING -->
+                <div id="view-meeting" class="hidden fade-in h-full flex flex-col justify-center items-center text-center">
+                    <div class="bg-white dark:bg-slate-900 p-12 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl max-w-lg w-full">
+                         <div class="mx-auto w-20 h-20 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mb-6"><i data-lucide="video" class="w-10 h-10 text-pink-500"></i></div>
+                         <h3 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">Team Weekly Sync</h3>
+                         <p class="text-slate-500 mb-8">Ready to join? 5 people are currently in the meeting.</p>
+                         <div class="space-y-3 w-full">
+                            <button onclick="alert('Joining Video Call...')" class="w-full bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-700 transition transform hover:scale-105 flex items-center justify-center">
+                                <i data-lucide="log-in" class="w-5 h-5 mr-2"></i> Join Meeting
+                            </button>
+                            <button onclick="showToast('Meeting Link Created')" class="admin-only w-full bg-pink-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-pink-700 transition transform hover:scale-105 flex items-center justify-center">
+                                <i data-lucide="video" class="w-5 h-5 mr-2"></i> Create New Meeting
+                            </button>
+                         </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- MODAL: HIRE EMPLOYEE -->
+            <div id="modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-lg p-6 border border-slate-200 dark:border-slate-700">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-lg text-slate-800 dark:text-white">Hire Employee</h3>
+                        <button onclick="closeModal('modal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                             <div><label class="block text-xs font-bold text-slate-500 mb-1">Role</label><select id="newRole" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" onchange="updateId()"><option value="Employee">Employee</option><option value="HR">HR Manager</option><option value="Admin">Admin</option></select></div>
+                             <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee ID</label><input id="newId" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white font-mono" placeholder="Edit or auto-generated"></div>
+                        </div>
+                        <input id="newName" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" placeholder="Full Name">
+                        <input id="newEmail" type="email" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" placeholder="Gmail ID">
+                        <div class="grid grid-cols-2 gap-4">
+                             <input id="newPost" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" placeholder="Post / Role">
+                             <select id="newDept" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white appearance-none">
+                                <option value="" disabled selected>Select Dept</option>
+                                <!-- Injected dynamically by JS -->
+                             </select>
+                        </div>
+                        <input id="newSalary" type="number" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white mt-4" placeholder="Yearly Salary (₹)">
+                    </div>
+                    <div class="mt-6 flex gap-3">
+                        <button onclick="closeModal('modal')" class="flex-1 py-2 border rounded-lg dark:border-slate-600 dark:text-slate-300">Cancel</button>
+                        <button onclick="saveEmployee()" class="flex-1 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700">Save Record</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL: ADD DEPARTMENT -->
+            <div id="deptModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-6 border border-slate-200 dark:border-slate-700">
+                    <h3 class="font-bold text-lg text-slate-800 dark:text-white mb-4">New Department</h3>
+                    <div class="space-y-3">
+                        <input id="deptName" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" placeholder="Department Name">
+                        <input id="deptManager" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" placeholder="Manager Name">
+                        <input id="deptBudget" type="number" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" placeholder="Budget (₹)">
+                    </div>
+                    <div class="mt-6 flex gap-3">
+                        <button onclick="closeModal('deptModal')" class="flex-1 py-2 border rounded-lg dark:border-slate-600 dark:text-slate-300">Cancel</button>
+                        <button onclick="saveDepartment()" class="flex-1 py-2 bg-emerald-600 text-white rounded-lg font-bold">Add Department</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL: REQUEST LEAVE -->
+            <div id="leaveModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-6 border border-slate-200 dark:border-slate-700">
+                    <h3 class="font-bold text-lg text-slate-800 dark:text-white mb-4">Request Leave</h3>
+                    <div class="space-y-3">
+                        <select id="leaveType" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white"><option>Sick Leave</option><option>Casual Leave</option></select>
+                        <input type="number" id="leaveDays" placeholder="Number of Days" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                        <textarea id="leaveReason" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" placeholder="Reason..."></textarea>
+                    </div>
+                    <div class="mt-6 flex gap-3">
+                        <button onclick="closeModal('leaveModal')" class="flex-1 py-2 border rounded-lg dark:border-slate-600 dark:text-slate-300">Cancel</button>
+                        <button onclick="submitLeave()" class="flex-1 py-2 bg-indigo-600 text-white rounded-lg font-bold">Submit Request</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL: PERFORMANCE REVIEW -->
+            <div id="performanceModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-6 border border-slate-200 dark:border-slate-700">
+                    <h3 class="font-bold text-lg text-slate-800 dark:text-white mb-4">Add Performance Review</h3>
+                    <div class="space-y-3">
+                        <select id="perfEmpId" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                            <option value="">Select Employee...</option>
+                        </select>
+                        <input type="number" id="perfRating" min="1" max="5" placeholder="Rating (1-5)" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                        <textarea id="perfReview" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" placeholder="Review notes..."></textarea>
+                    </div>
+                    <div class="mt-6 flex gap-3">
+                        <button onclick="closeModal('performanceModal')" class="flex-1 py-2 border rounded-lg dark:border-slate-600 dark:text-slate-300">Cancel</button>
+                        <button onclick="savePerformance()" class="flex-1 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700">Save Review</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL: ANNOUNCEMENT -->
+            <div id="announcementModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-6 border border-slate-200 dark:border-slate-700">
+                    <h3 class="font-bold text-lg text-slate-800 dark:text-white mb-4">New Announcement</h3>
+                    <div class="space-y-3">
+                        <input id="annTitle" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" placeholder="Announcement Title">
+                        <textarea id="annContent" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" placeholder="Message content..." rows="4"></textarea>
+                    </div>
+                    <div class="mt-6 flex gap-3">
+                        <button onclick="closeModal('announcementModal')" class="flex-1 py-2 border rounded-lg dark:border-slate-600 dark:text-slate-300">Cancel</button>
+                        <button onclick="saveAnnouncement()" class="flex-1 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700">Publish</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL: PAYMENT / SUBSCRIPTION -->
+            <div id="paymentModal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+                    <div class="p-6 bg-indigo-600 text-white text-center">
+                        <h2 class="text-2xl font-bold mb-1">Upgrade to Premium</h2>
+                        <p class="text-indigo-200 text-sm">Unlock unlimited features and remove limits.</p>
+                    </div>
+                    
+                    <!-- Step 1: Select Plan -->
+                    <div id="planSelection" class="p-6">
+                        <h3 class="font-bold text-gray-800 dark:text-white mb-4">Choose your plan</h3>
+                        <div class="border-2 border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-xl mb-4 cursor-pointer relative" onclick="showQRCode()">
+                            <div class="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded-bl-lg rounded-tr-xl font-bold">BEST VALUE</div>
+                            <div class="flex justify-between items-center"><h3 class="font-bold text-lg dark:text-white">Yearly</h3><span class="text-indigo-600 dark:text-indigo-400 font-bold text-xl">₹10,000/yr</span></div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Save ₹2,000 per year</p>
+                        </div>
+                        <div class="border border-gray-200 dark:border-gray-700 p-4 rounded-xl mb-6 hover:border-indigo-500 cursor-pointer transition-colors" onclick="showQRCode()">
+                            <div class="flex justify-between items-center"><h3 class="font-bold text-gray-800 dark:text-gray-200">Monthly</h3><span class="text-gray-600 dark:text-gray-400 font-bold">₹1,000/mo</span></div>
+                        </div>
+                        <button onclick="closeModal('paymentModal')" class="w-full py-3 text-gray-500 hover:text-gray-800 dark:hover:text-white font-bold">Cancel</button>
+                    </div>
+
+                    <!-- Step 2: Scan QR -->
+                    <div id="qrCodeSection" class="hidden p-6 text-center">
+                        <button onclick="hideQRCode()" class="text-sm text-gray-500 mb-4 flex items-center hover:text-gray-800 dark:hover:text-white"><i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back</button>
+                        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Roz Pay Transfer</h2>
+                        <div class="bg-gray-100 dark:bg-gray-700 p-6 rounded-xl mb-6 border border-gray-200 dark:border-gray-600">
+                             <div class="bg-white p-2 w-32 h-32 mx-auto mb-3 flex items-center justify-center border rounded-lg shadow-sm">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=6372995996@axl&pn=EnterpriseApp&cu=INR" alt="QR Code" class="w-full h-full object-contain">
+                             </div>
+                             <p class="font-mono font-bold text-lg bg-white dark:bg-gray-800 dark:text-white inline-block px-3 py-1 border dark:border-gray-600 rounded select-all tracking-wider">6372995996@axl</p>
+                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Scan or copy UPI ID</p>
+                        </div>
+                        <button onclick="completePayment()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold flex items-center justify-center shadow-lg transition-transform hover:scale-105">
+                            <i data-lucide="check-circle" class="w-5 h-5 mr-2"></i> I Have Transferred
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // --- 1. DATA STATE MANAGEMENT (Memory & Presets) ---
+        const defaultState = {
+            isSubscribed: false,
+            users: [
+                { email: 'employees568@gmail.com', id: 'Boss0000', pass: 'Employees123', role: 'Boss' },
+                { email: 'admin@company.com', id: 'ADHR0001', pass: 'Employees123', role: 'Admin' },
+                { email: 'hr@company.com', id: 'HR00001', pass: 'Employees123', role: 'HR' },
+                { email: 'emp@company.com', id: 'EM0001', pass: 'Employees123', role: 'Employee' }
+            ],
+            employees: [
+                { id: 'Boss0000', name: 'System Boss', email: 'employees568@gmail.com', role: 'Boss', post: 'CEO', dept: 'Executive', salary: 5000000 },
+                { id: 'ADHR0001', name: 'System Admin', email: 'admin@company.com', role: 'Admin', post: 'Administrator', dept: 'Executive', salary: 2500000 },
+                { id: 'HR00001', name: 'HR Manager', email: 'hr@company.com', role: 'HR', post: 'Head of HR', dept: 'Human Resources', salary: 1500000 },
+                { id: 'EM0001', name: 'Normal Employee', email: 'emp@company.com', role: 'Employee', post: 'Software Engineer', dept: 'Engineering', salary: 800000 }
+            ],
+            departments: [
+                { name: 'Executive', manager: 'Boss', used: 10 },
+                { name: 'Human Resources', manager: 'HR Manager', used: 25 },
+                { name: 'Engineering', manager: 'Alice Sharma', used: 75 }
+            ],
+            leaves: [
+                { id: 1, empId: 'EM0001', empName: 'Normal Employee', type: 'Sick Leave', days: 2, status: 'Pending', reason: 'Flu' }
+            ],
+            announcements: [
+                { id: 1, title: 'Welcome to the new HR Portal!', content: 'We are excited to launch the new centralized system.', date: new Date().toISOString().split('T')[0], author: 'Boss' }
+            ],
+            attendance: [],
+            reviews: [],
+            counters: { Boss: 1, Admin: 2, HR: 2, Employee: 2 }
+        };
+
+        // Using V5 to cleanly reset and apply the unified passwords and fixed roles
+        let savedState = JSON.parse(localStorage.getItem('myEmployeesDataV5'));
+        let appState = savedState || defaultState;
+        
+        // Safety Fallbacks
+        appState.announcements = appState.announcements || defaultState.announcements;
+        appState.leaves = appState.leaves || [];
+        appState.attendance = appState.attendance || [];
+        appState.reviews = appState.reviews || [];
+
+        let currentContext = { role: null, id: null };
+
+        function saveData() {
+            localStorage.setItem('myEmployeesDataV5', JSON.stringify(appState));
+        }
+        
+        function resetData() {
+            if(confirm("Factory Reset? This will delete all created data.")) {
+                localStorage.removeItem('myEmployeesDataV5');
+                location.reload();
+            }
+        }
+
+        // --- RENDER FUNCTIONS ---
+
+        function renderAll() {
+            renderDashboard();
+            renderAnnouncements();
+            renderEmployees();
+            renderDepartments();
+            renderLeaves();
+            renderAttendance();
+            renderPerformance();
+            
+            const banner = document.getElementById('trialBanner');
+            if(banner) {
+                if(appState.isSubscribed) banner.classList.add('hidden');
+                else banner.classList.remove('hidden');
+            }
+        }
+
+        function renderDashboard() {
+            let list = appState.employees;
+            if(currentContext.role === 'Employee') {
+                list = appState.employees.filter(e => e.id === currentContext.id);
+            }
+            
+            document.getElementById('statTotal').innerText = list.length;
+            
+            if(currentContext.role === 'Employee') {
+                const myData = list[0];
+                document.getElementById('statPayroll').innerText = myData ? '₹' + (myData.salary/100000).toFixed(1) + 'L' : 'N/A';
+                document.getElementById('payrollLabel').innerText = 'My Salary';
+                document.getElementById('empCountLabel').innerText = 'My Profile';
+            } else {
+                const total = appState.employees.reduce((acc, e) => acc + (e.salary || 0), 0);
+                document.getElementById('statPayroll').innerText = '₹' + (total / 100000).toFixed(1) + 'L';
+                document.getElementById('payrollLabel').innerText = 'Total Payroll';
+                document.getElementById('empCountLabel').innerText = 'Total Employees';
+            }
+        }
+
+        function renderAnnouncements() {
+            const list = document.getElementById('announcementList');
+            list.innerHTML = '';
+            
+            // Reverse so newest is first
+            [...appState.announcements].reverse().forEach(ann => {
+                const div = document.createElement('div');
+                div.className = "bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm fade-in";
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg text-indigo-600 dark:text-indigo-400">${ann.title}</h3>
+                        <span class="text-xs text-slate-400">${ann.date}</span>
+                    </div>
+                    <p class="text-slate-700 dark:text-slate-300 text-sm mb-3">${ann.content}</p>
+                    <p class="text-xs font-medium text-slate-500">Posted by: ${ann.author}</p>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function renderEmployees() {
+            const tbody = document.getElementById('empTable');
+            tbody.innerHTML = '';
+            
+            let list = appState.employees;
+            if(currentContext.role === 'Employee') list = list.filter(e => e.id === currentContext.id);
+
+            list.forEach(e => {
+                let color = "bg-blue-100 text-blue-700";
+                if(e.role === 'Boss') color = "bg-purple-100 text-purple-700";
+                else if(e.role === 'Admin') color = "bg-indigo-100 text-indigo-700";
+                else if(e.role === 'HR') color = "bg-pink-100 text-pink-700";
+                
+                const btn = currentContext.role === 'Employee' ? '' : 
+                    `<button class="text-red-400 hover:text-red-600 admin-only" onclick="deleteEmployee('${e.id}')"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/50 transition fade-in";
+                tr.innerHTML = `
+                    <td class="p-4 font-mono text-xs font-bold text-indigo-500">${e.id}</td>
+                    <td class="p-4"><div class="font-medium text-slate-700 dark:text-slate-200">${e.name}</div><div class="text-xs text-slate-400">${e.email}</div></td>
+                    <td class="p-4 text-sm text-slate-500">${e.role}</td>
+                    <td class="p-4"><span class="${color} px-2 py-1 rounded text-xs font-bold">${e.dept}</span></td>
+                    <td class="admin-only p-4 text-right">${btn}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function renderDepartments() {
+            const grid = document.getElementById('deptGrid');
+            grid.innerHTML = '';
+            appState.departments.forEach((d, i) => {
+                const delBtn = currentContext.role === 'Employee' ? '' : 
+                    `<button onclick="deleteDepartment(${i})" class="absolute top-3 right-3 text-red-400 hover:text-red-600 admin-only"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                
+                const div = document.createElement('div');
+                div.className = "bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 fade-in relative";
+                div.innerHTML = `
+                    ${delBtn}
+                    <h3 class="font-bold text-lg mb-2 dark:text-white">${d.name}</h3>
+                    <p class="text-sm text-slate-500 mb-4">Manager: ${d.manager}</p>
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 mb-2"><div class="bg-indigo-500 h-2 rounded-full" style="width: ${d.used}%"></div></div>
+                    <p class="text-xs text-slate-400">Budget: ${d.used}% Used</p>
+                `;
+                grid.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function renderLeaves() {
+            const list = document.getElementById('leaveList');
+            list.innerHTML = '';
+            
+            let displayList = appState.leaves;
+            if(currentContext.role === 'Employee') displayList = displayList.filter(l => l.empId === currentContext.id);
+
+            displayList.forEach(l => {
+                const div = document.createElement('div');
+                div.className = "bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center fade-in gap-4";
+                
+                let actions = '';
+                if(l.status === 'Pending') {
+                    if (currentContext.role !== 'Employee') {
+                        actions = `<button class="p-2 bg-green-100 text-green-700 rounded-lg mr-2 hover:bg-green-200" onclick="updateLeave(${l.id}, 'Approved')"><i data-lucide="check" class="w-4 h-4"></i></button>
+                                   <button class="p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200" onclick="updateLeave(${l.id}, 'Rejected')"><i data-lucide="x" class="w-4 h-4"></i></button>`;
+                    } else {
+                        actions = `<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-bold">Pending</span>`;
+                    }
+                } else {
+                    const color = l.status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                    actions = `<span class="${color} px-2 py-1 rounded text-xs font-bold">${l.status}</span>`;
+                }
+
+                div.innerHTML = `
+                    <div>
+                        <h4 class="font-bold dark:text-white">${l.empName}</h4>
+                        <p class="text-sm text-slate-500">${l.type} • ${l.days} Days</p>
+                        ${l.reason ? `<p class="text-xs text-slate-400 mt-1 italic">"${l.reason}"</p>` : ''}
+                    </div>
+                    <div class="flex">${actions}</div>
+                `;
+                list.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function renderAttendance() {
+            const tbody = document.getElementById('attendanceTable');
+            tbody.innerHTML = '';
+            
+            let list = appState.employees;
+            if(currentContext.role === 'Employee') list = list.filter(e => e.id === currentContext.id);
+            const today = new Date().toISOString().split('T')[0];
+
+            list.forEach(e => {
+                const record = appState.attendance.find(a => a.empId === e.id && a.date === today);
+                const status = record ? record.status : 'Not Marked';
+                
+                let actions = '';
+                if(currentContext.role !== 'Employee' || (currentContext.role === 'Employee' && status === 'Not Marked')) {
+                     actions = `<button onclick="markAtt('${e.id}','Present')" class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded mr-2 font-bold hover:bg-green-200 transition">Present</button>
+                                <button onclick="markAtt('${e.id}','Absent')" class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded font-bold hover:bg-red-200 transition">Absent</button>`;
+                } else {
+                     const color = status === 'Present' ? 'text-green-500' : 'text-red-500';
+                     actions = `<span class="${color} font-bold text-sm">${status}</span>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td class="p-4 font-bold dark:text-white">${e.name}</td><td class="p-4 text-right">${actions}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function renderPerformance() {
+             const grid = document.getElementById('performanceGrid');
+             grid.innerHTML = '';
+             let list = appState.reviews;
+             if(currentContext.role === 'Employee') list = list.filter(r => r.empId === currentContext.id);
+             
+             list.forEach(r => {
+                 const div = document.createElement('div');
+                 div.className = "bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm fade-in";
+                 div.innerHTML = `<div class="flex justify-between mb-2"><h4 class="font-bold dark:text-white">${r.empName}</h4><span class="text-yellow-500 font-bold">${r.rating}/5 ⭐</span></div><p class="text-sm italic opacity-70">"${r.review}"</p>`;
+                 grid.appendChild(div);
+             });
+        }
+
+        // --- ACTIONS & UI LOGIC ---
+
+        function goToHome() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('registerScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.add('hidden');
+            document.getElementById('landingScreen').classList.remove('hidden');
+            document.getElementById('landingScreen').classList.add('fade-in');
+        }
+
+        function goToLogin() {
+            document.getElementById('landingScreen').classList.add('hidden');
+            document.getElementById('registerScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden', 'slide-out');
+            document.getElementById('loginScreen').classList.add('fade-in');
+        }
+
+        function goToRegister() {
+            document.getElementById('landingScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('registerScreen').classList.remove('hidden');
+            document.getElementById('registerScreen').classList.add('fade-in');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const id = document.getElementById('loginId').value.trim().toUpperCase();
+            const pass = document.getElementById('loginPassword').value.trim();
+            const btn = document.getElementById('btnText');
+            
+            btn.innerText = "Verifying...";
+            
+            setTimeout(() => {
+                // Find user by ID (case insensitive)
+                const user = appState.users.find(u => u.id.toUpperCase() === id);
+                
+                if (user) {
+                    // Check Password
+                    if (user.pass !== pass) {
+                        alert('Invalid Password. Please try again.');
+                        btn.innerText = "Login to Workspace";
+                        return;
+                    }
+                    
+                    // Check Email and provide helpful feedback if wrong
+                    if (user.email.toLowerCase() !== email) {
+                        alert(`Login Failed: The email associated with ID ${user.id} is actually ${user.email}`);
+                        btn.innerText = "Login to Workspace";
+                        return;
+                    }
+                    
+                    // Success!
+                    currentContext = { role: user.role, id: user.id };
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('appScreen').classList.remove('hidden');
+                    document.getElementById('appScreen').classList.add('fade-in');
+                    
+                    const roleDropdown = document.getElementById('roleSelector');
+                    if (roleDropdown) roleDropdown.value = user.role;
+
+                    // HIDE ROLE SIMULATOR FOR NON-BOSS
+                    const roleSimulatorContainer = document.getElementById('roleSimulatorContainer');
+                    if (roleSimulatorContainer) {
+                        roleSimulatorContainer.style.display = (user.role === 'Boss') ? 'block' : 'none';
+                    }
+                    
+                    updateRole(false); // false means do not override ID
+                    renderAll();
+                } else {
+                    alert(`Invalid Login. Employee ID '${id}' not found.`);
+                    btn.innerText = "Login to Workspace";
+                }
+            }, 600);
+        }
+
+        function handleLogout() { 
+            // Wipe current session correctly without reloading page
+            currentContext = { role: null, id: null };
+            
+            // Clear input fields for security
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginId').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('btnText').innerText = 'Login to Workspace';
+
+            // Return to Landing Page smoothly
+            goToHome();
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const pass = document.getElementById('regPassword').value;
+            const role = document.getElementById('regRole').value;
+            
+            // Auto Generate ID Logic mapping user requests explicitly
+            let prefix = "EM";
+            let count = appState.counters.Employee;
+            let pad = 4;
+            
+            if (role === 'Admin') { prefix = "ADHR"; count = appState.counters.Admin; pad = 4; }
+            else if (role === 'HR') { prefix = "HR"; count = appState.counters.HR; pad = 5; }
+
+            const id = prefix + String(count).padStart(pad, '0');
+            
+            // Update counter
+            if (role === 'Admin') appState.counters.Admin++;
+            else if (role === 'HR') appState.counters.HR++;
+            else appState.counters.Employee++;
+            
+            appState.users.push({ email, id, pass, role });
+            appState.employees.push({ id, name, email, role, post: 'New User', dept: 'General', salary: 500000 });
+            
+            saveData();
+            alert("Registration Successful!\n\nYour Auto-Generated Employee ID is:\n" + id + "\n\nPLEASE SAVE THIS ID TO LOGIN.");
+            goToLogin();
+        }
+
+        function switchTab(tabId) {
+            ['dashboard','announcements','employees','departments','leaves','attendance','performance','documents','meeting','chat'].forEach(id => {
+                const view = document.getElementById('view-' + id);
+                const nav = document.getElementById('nav-' + id);
+                if(view) view.classList.add('hidden');
+                if(nav) nav.classList.remove('active-nav');
+            });
+            
+            const tgtView = document.getElementById('view-' + tabId);
+            const tgtNav = document.getElementById('nav-' + tabId);
+            if(tgtView) tgtView.classList.remove('hidden');
+            if(tgtNav) tgtNav.classList.add('active-nav');
+            
+            document.getElementById('pageTitle').innerText = tabId.charAt(0).toUpperCase() + tabId.slice(1);
+        }
+
+        function showRegister() { goToRegister(); }
+        function showLogin() { goToLogin(); }
+        
+        function openModal() { 
+            document.getElementById('modal').classList.remove('hidden'); 
+            updateId(); 
+            
+            const deptSelect = document.getElementById('newDept');
+            deptSelect.innerHTML = '<option value="" disabled selected>Select Department</option>';
+            appState.departments.forEach(d => {
+                deptSelect.innerHTML += `<option value="${d.name}">${d.name}</option>`;
+            });
+        }
+        function openDeptModal() { document.getElementById('deptModal').classList.remove('hidden'); }
+        function openLeaveModal() { document.getElementById('leaveModal').classList.remove('hidden'); }
+        function openAnnouncementModal() { document.getElementById('announcementModal').classList.remove('hidden'); }
+
+        function deleteEmployee(id) {
+            if(confirm("Delete Employee?")) {
+                appState.employees = appState.employees.filter(e => e.id !== id);
+                appState.users = appState.users.filter(u => u.id !== id);
+                saveData();
+                renderAll();
+            }
+        }
+        
+        function saveDepartment() {
+            const name = document.getElementById('deptName').value;
+            const manager = document.getElementById('deptManager').value;
+            appState.departments.push({ name, manager, used: 0 });
+            saveData();
+            renderAll();
+            closeModal('deptModal');
+            showToast("Department Created");
+        }
+        
+        function deleteDepartment(i) {
+            if(confirm("Delete Department?")) {
+                appState.departments.splice(i, 1);
+                saveData();
+                renderAll();
+            }
+        }
+        
+        function submitLeave() {
+            const type = document.getElementById('leaveType').value;
+            const days = document.getElementById('leaveDays').value;
+            const reason = document.getElementById('leaveReason').value;
+            
+            if (!days) return alert("Please specify the number of days.");
+
+            const user = appState.employees.find(e => e.id === currentContext.id) || { id: currentContext.id, name: 'Employee' };
+            
+            appState.leaves.push({ 
+                id: Date.now(), 
+                empId: user.id, 
+                empName: user.name, 
+                type, 
+                days, 
+                reason, 
+                status: 'Pending' 
+            });
+            
+            saveData();
+            renderAll();
+            closeModal('leaveModal');
+            showToast("Leave Requested");
+        }
+        
+        function updateLeave(leaveId, status) {
+            const leaveIndex = appState.leaves.findIndex(l => l.id === leaveId);
+            if (leaveIndex !== -1) {
+                appState.leaves[leaveIndex].status = status;
+                saveData();
+                renderAll();
+                showToast("Leave " + status);
+            }
+        }
+        
+        function markAtt(id, status) {
+            const today = new Date().toISOString().split('T')[0];
+            appState.attendance.push({ empId: id, date: today, status });
+            saveData();
+            renderAll();
+            showToast("Attendance Marked");
+        }
+        
+        function savePerformance() {
+            const empId = document.getElementById('perfEmpId').value;
+            const rating = document.getElementById('perfRating').value;
+            const review = document.getElementById('perfReview').value;
+            if(!empId || !rating) return alert("Select employee and rating");
+            
+            const emp = appState.employees.find(e => e.id === empId);
+            appState.reviews.push({ empId, empName: emp.name, rating, review });
+            saveData();
+            renderAll();
+            closeModal('performanceModal');
+            showToast("Review Saved");
+        }
+
+        function saveAnnouncement() {
+            const title = document.getElementById('annTitle').value;
+            const content = document.getElementById('annContent').value;
+            
+            if(!title || !content) return alert("Title and content required");
+
+            const author = appState.employees.find(e => e.id === currentContext.id)?.name || 'Admin';
+            
+            appState.announcements.push({
+                id: Date.now(),
+                title,
+                content,
+                date: new Date().toISOString().split('T')[0],
+                author
+            });
+
+            saveData();
+            renderAll();
+            closeModal('announcementModal');
+            showToast("Announcement Published");
+        }
+
+        // --- PAYMENT MODAL LOGIC ---
+        function openPaymentModal() {
+            document.getElementById('paymentModal').classList.remove('hidden');
+            document.getElementById('planSelection').classList.remove('hidden');
+            document.getElementById('qrCodeSection').classList.add('hidden');
+        }
+        
+        function showQRCode() {
+            document.getElementById('planSelection').classList.add('hidden');
+            document.getElementById('qrCodeSection').classList.remove('hidden');
+        }
+        
+        function hideQRCode() {
+            document.getElementById('planSelection').classList.remove('hidden');
+            document.getElementById('qrCodeSection').classList.add('hidden');
+        }
+        
+        function completePayment() {
+            appState.isSubscribed = true;
+            saveData();
+            renderAll();
+            closeModal('paymentModal');
+            showToast("Payment Successful! Premium Unlocked.");
+        }
+
+        function openPerformanceModal() {
+            const s = document.getElementById('perfEmpId'); s.innerHTML='<option value="">Select...</option>';
+            appState.employees.forEach(e => s.innerHTML += `<option value="${e.id}">${e.name}</option>`);
+            document.getElementById('performanceModal').classList.remove('hidden');
+        }
+        
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        
+        function updateId() {
+            const r = document.getElementById('newRole')?.value || 'Employee';
+            let p="EM", c=appState.counters.Employee, pad=4;
+            if(r==='Admin'){p="ADHR";c=appState.counters.Admin;pad=4;}
+            if(r==='HR'){p="HR";c=appState.counters.HR;pad=5;}
+            
+            const idField = document.getElementById('newId');
+            if(idField) idField.value = p + String(c).padStart(pad, '0');
+        }
+
+        function saveEmployee() {
+            const name = document.getElementById('newName').value;
+            const email = document.getElementById('newEmail').value;
+            const id = document.getElementById('newId').value;
+            const role = document.getElementById('newRole').value;
+            const post = document.getElementById('newPost').value;
+            const dept = document.getElementById('newDept').value;
+            const salary = Number(document.getElementById('newSalary').value);
+
+            if (!name || !email || !post || !dept || !salary || !id) {
+                alert("Please fill all fields and provide an ID.");
+                return;
+            }
+
+            appState.employees.push({ id, name, email, role, post, dept, salary });
+            appState.users.push({ email, id, pass: 'Employees123', role }); // Default pass
+            
+            if(role === 'Admin') appState.counters.Admin++;
+            else if(role === 'HR') appState.counters.HR++;
+            else appState.counters.Employee++;
+            
+            saveData();
+            renderAll();
+            closeModal('modal');
+            showToast("Employee Added (Password: Employees123)");
+        }
+
+        // Enforces UI limitations and syncing based on current user / dropdown selection
+        function updateRole(isSimulator = false) {
+            const role = document.getElementById('roleSelector')?.value || currentContext.role;
+            currentContext.role = role;
+            
+            if (isSimulator) {
+                if (role === 'Boss') currentContext.id = 'Boss0000';
+                else if (role === 'Admin') currentContext.id = 'ADHR0001';
+                else if (role === 'HR') currentContext.id = 'HR00001';
+                else currentContext.id = 'EM0001';
+            }
+
+            document.getElementById('userAvatar').innerText = role.substring(0,2).toUpperCase();
+            document.getElementById('currentRoleLabel').innerText = role === 'Boss' ? 'Ultimate Boss' : role + ' User';
+            document.getElementById('currentIdLabel').innerText = currentContext.id;
+            
+            const els = document.querySelectorAll('.admin-only');
+            els.forEach(el => {
+                if (role === 'Employee') el.classList.add('hidden');
+                else el.classList.remove('hidden');
+            });
+            
+            renderAll();
+        }
+        
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            t.style.transform="translateX(0)"; t.style.opacity="1";
+            setTimeout(()=>{ t.style.transform="translateX(200%)"; t.style.opacity="0"; }, 3000);
+        }
+        
+        function toggleTheme() { document.documentElement.classList.toggle('dark'); }
+        
+        lucide.createIcons();
+    </script>
+</body>
+</html>
